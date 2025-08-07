@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Create Post</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+
+</head>
+<body>
+  <h1>Create Post</h1>
+
+  <form id="postForm">
+    <input type="text" id="title" name="title" placeholder="Enter Post Title" required>
+    <input type="text" id="tag" name="tag" placeholder="Enter tag" required>
+    <textarea id="description" name="description" placeholder="Enter Post Description" required></textarea>
+    <button type="submit">Create Post</button>
+</form>
+<div class="button-container">
+  <button onclick="window.location.href='/dashboard'" style="margin-top: 10px;">Back to Dashboard</button>
+</div>
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please login first.");
+      window.location.href = "/login";
+    }
+
+    document.getElementById("postForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const title = e.target.title.value;
+      const description = e.target.description.value;
+
+      const res = await fetch("/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ title, description })
+
+      });
+
+      if (res.ok) {
+        alert("Post created!");
+        window.location.href = "/blog";
+      } else {
+        const err = await res.json();
+        alert("Failed to create post: " + (err.msg || JSON.stringify(err)));
+      }
+    });
+  </script>
+</body>
+</html>
